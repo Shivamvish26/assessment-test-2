@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const User = require("./model/User");
-const { asyncWrapProviders } = require("node:async_hooks");
+const Post = require("./model/Post")
 
 // db connection
 require("./db/config");
@@ -9,13 +9,12 @@ require("./db/config");
 //middleware
 app.use(express.json());
 
-//register route
-// app.post("/register", async (req, resp) => {
-//   let user = new User(req.body);
-//   let result = await user.save();
-//   resp.send(result);
-// });
+//Cehcking route
+// app.post("/sample",(req,resp)=>{
+//   resp.send("Sample Post API is working");
+// })
 
+// register api
 app.post("/register", async (req, resp) => {
   try {
     let user = new User(req.body);
@@ -27,6 +26,8 @@ app.post("/register", async (req, resp) => {
     resp.status(500).send({ message: "Error in registering user" });
   }
 });
+
+// --------------------------------------------------------------------------------------------
 
 //login api
 app.post("/login", async (req, resp) => {
@@ -46,6 +47,32 @@ app.post("/login", async (req, resp) => {
     resp.status(400).send({ message: "Email and Password required" });
   }
 });
+
+// -----------------------------------------------------------------------------------------------
+
+// Create Post API
+app.post("/create", async (req,resp)=>{
+  const post = new Post(req.body);
+  const result = await post.save();
+  resp.send({
+    message:"Post Created Successfully",
+    post:result
+  });
+})
+
+// ----------------------------------------------------------------------------------------------
+
+// get all post api
+app.get("/", async (req,resp)=>{
+  const posts = await Post.find({status:"published"})
+  resp.send({
+    message:"All Published Posts",
+    posts:posts
+  })
+})
+
+// -----------------------------------------------------------------------------------------------
+
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
