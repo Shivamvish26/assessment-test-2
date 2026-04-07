@@ -1,13 +1,19 @@
 const express = require("express");
 const app = express();
 const User = require("./model/User");
-const Post = require("./model/Post")
+const Post = require("./model/Post");
+const Like = require("./model/Likes");
+const Comment = require("./model/Comment");
+const cors = require("cors");
 
 // db connection
 require("./db/config");
 
 //middleware
 app.use(express.json());
+
+// Enable CORS for all routes
+app.use(cors());
 
 //Cehcking route
 // app.post("/sample",(req,resp)=>{
@@ -16,15 +22,15 @@ app.use(express.json());
 
 // register api
 app.post("/register", async (req, resp) => {
-  try {
-    let user = new User(req.body);
-    let result = await user.save();
-    result = result.toObject(); // Convert the Mongoose document to a plain JavaScript object
-    delete result.password; // Remove the password field from the result before sending the response
-    resp.send({ message: "User registered successfully", user: result });
-  } catch (err) {
-    resp.status(500).send({ message: "Error in registering user" });
+  let existingUser = await User.findOne({ email: req.body.email });
+  if (existingUser) {
+    return resp.send({ message: "Email already registered" });
   }
+  let user = new User(req.body);
+  let result = await user.save();
+  result = result.toObject();
+  delete result.password;
+  resp.send({ message: "User registered successfully", user: result });
 });
 
 // --------------------------------------------------------------------------------------------
@@ -51,28 +57,154 @@ app.post("/login", async (req, resp) => {
 // -----------------------------------------------------------------------------------------------
 
 // Create Post API
-app.post("/create", async (req,resp)=>{
+app.post("/create", async (req, resp) => {
   const post = new Post(req.body);
   const result = await post.save();
   resp.send({
-    message:"Post Created Successfully",
-    post:result
+    message: "Post Created Successfully",
+    post: result,
   });
-})
+});
 
 // ----------------------------------------------------------------------------------------------
 
 // get all post api
-app.get("/", async (req,resp)=>{
-  const posts = await Post.find({status:"published"})
+app.get("/", async (req, resp) => {
+  const posts = await Post.find({ status: "published" });
   resp.send({
-    message:"All Published Posts",
-    posts:posts
-  })
-})
+    message: "All Published Posts",
+    posts: posts,
+  });
+});
 
 // -----------------------------------------------------------------------------------------------
 
+// get single post api
+app.get("/:id", async (req, resp) => {
+  const post = await Post.findById(req.params.id);
+  resp.send({
+    message: "Post found",
+    post: post,
+  });
+});
+
+// -----------------------------------------------------------------------------------------------
+
+// update post api
+app.put("/:id", async (req, resp) => {
+  const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+  if (!post) {
+    return resp.status(404).send({ message: "Post not found" });
+  }
+  resp.send({
+    message: "Post updated successfully",
+    post: post,
+  });
+});
+
+// -----------------------------------------------------------------------------------------------
+
+// Delete post api
+app.delete("/:id", async (req, resp) => {
+  const post = await Post.findByIdAndDelete(req.params.id);
+
+  if (!post) {
+    return resp.status(404).send({ message: "Post not found" });
+  }
+
+  resp.send({
+    message: "Post deleted successfully",
+  });
+});
+// -----------------------------------------------------------------------------------------------
+
+// Get user drafts
+app.get("/drafts/:author", async (req, resp) => {
+  const drafts = await Post.find({
+    author: req.params.author,
+    status: "draft",
+  });
+  resp.send({
+    message: "Drafts found",
+    drafts: drafts,
+  });
+});
+
+// -----------------------------------------------------------------------------------------------
+
+// like and unlike post api
+app.post("/api/like/:postId", async (req, resp) => {
+  const { user } = req.body;
+  const { postId } = req.params;
+  const existing = await Like.findOne({ user, post: postId });
+  if (existing) {
+    await Like.deleteOne({ _id: existing._id });
+    return resp.send({
+      message: "Post unliked successfully",
+    });
+  } else {
+    await Like.create({ user, post: postId });
+    return resp.send({
+      message: "Post liked successfully",
+    });
+  }
+});
+
+// -----------------------------------------------------------------------------------------------
+
+// Total Count of like for a post
+app.get("/api/count/:postId", async (req, resp) => {
+  console.log("Post ID:", req.params.postId);
+  const count = await Like.countDocuments({
+    post: req.params.postId,
+  });
+  console.log("Count:", count);
+  resp.send({
+    message: "Total likes for the post",
+    count: count,
+  });
+});
+
+// -----------------------------------------------------------------------------------------------
+
+// Comment on post api
+app.post("/api/comment/:postId", async (req, resp) => {
+  const { user, text } = req.body;
+  const { postId } = req.params;
+  if (!user || !text) {
+    return resp.send({ message: "User and text required" });
+  }
+  const comment = new Comment({
+    user,
+    text,
+    post: postId,
+  });
+  const result = await comment.save();
+  resp.send({
+    message: "Comment added successfully",
+    comment: result,
+  });
+});
+
+// -----------------------------------------------------------------------------------------------
+
+// get all comments for a post api
+
+app.get("/api/comment/:postId", async (req, resp) => {
+  const comments = await Comment.find({
+    post: req.params.postId,
+  });
+  resp.send({
+    message: "Comments for the post",
+    comments: comments,
+  });
+});
+
+// -----------------------------------------------------------------------------------------------
+
+// search api and pagination api
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
