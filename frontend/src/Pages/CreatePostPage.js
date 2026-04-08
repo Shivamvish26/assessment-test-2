@@ -45,6 +45,21 @@ export default function CreatePostPage() {
   const [postData, setPostData] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
 
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure?");
+    if (!confirmDelete) return;
+    try {
+      let result = await fetch(`http://localhost:5000/${id}`, {
+        method: "DELETE",
+      });
+      let res = await result.json();
+      alert(res.message);
+      setPostData(postData.filter((post) => post._id !== id));
+    } catch (error) {
+      console.log("Delete error", error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -102,12 +117,11 @@ export default function CreatePostPage() {
                           <i className="bi bi-pencil-square fs-5"></i>
                         </Link>
 
-                        <Link
-                          to={`/delete-post/${post._id}`}
-                          className="text-danger"
-                        >
-                          <i className="bi bi-trash fs-5"></i>
-                        </Link>
+                        <i
+                          className="bi bi-trash fs-5 text-danger"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleDelete(post._id)}
+                        ></i>
                       </td>
                     </tr>
                   );
