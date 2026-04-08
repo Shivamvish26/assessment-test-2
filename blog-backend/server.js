@@ -5,6 +5,7 @@ const Post = require("./model/Post");
 const Like = require("./model/Likes");
 const Comment = require("./model/Comment");
 const cors = require("cors");
+const multer = require("multer")
 
 // db connection
 require("./db/config");
@@ -14,6 +15,13 @@ app.use(express.json());
 
 // Enable CORS for all routes
 app.use(cors());
+
+app.use("/upload", express.static("upload"));
+
+// folder create karna
+const upload = multer({
+  dest:"upload/"
+})
 
 //Cehcking route
 // app.post("/sample",(req,resp)=>{
@@ -57,9 +65,26 @@ app.post("/login", async (req, resp) => {
 // -----------------------------------------------------------------------------------------------
 
 // Create Post API
-app.post("/create", async (req, resp) => {
-  const post = new Post(req.body);
+// app.post("/create", async (req, resp) => {
+//   const post = new Post(req.body);
+//   const result = await post.save();
+//   resp.send({
+//     message: "Post Created Successfully",
+//     post: result,
+//   });
+// });
+
+app.post("/create", upload.single("image"), async (req, resp) => {
+  const post = new Post({
+    title: req.body.title,
+    content: req.body.content,
+    author: req.body.author,
+    status: req.body.status,
+  image: req.file ? req.file.filename : ""
+  });
+
   const result = await post.save();
+
   resp.send({
     message: "Post Created Successfully",
     post: result,
@@ -68,11 +93,25 @@ app.post("/create", async (req, resp) => {
 
 // ----------------------------------------------------------------------------------------------
 
-// get all post api
-app.get("/", async (req, resp) => {
+// get all post api (home page api sirf published data)
+app.get("/get-post", async (req, resp) => {
   const posts = await Post.find({ status: "published" });
   resp.send({
     message: "All Published Posts",
+    posts: posts,
+  });
+});
+
+// ----------------------------------------------------------------------------------------------
+
+// get all post api for author as well as for the draf and published post
+app.get("/my-posts/:author", async (req, resp) => {
+  const posts = await Post.find({
+    author: req.params.author,
+  });
+
+  resp.send({
+    message: "All user posts",
     posts: posts,
   });
 });
@@ -91,16 +130,40 @@ app.get("/:id", async (req, resp) => {
 // -----------------------------------------------------------------------------------------------
 
 // update post api
-app.put("/:id", async (req, resp) => {
-  const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  });
+// app.put("/:id", async (req, resp) => {
+//   const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
+//     new: true,
+//   });
+//   if (!post) {
+//     return resp.status(404).send({ message: "Post not found" });
+//   }
+//   resp.send({
+//     message: "Post updated successfully",
+//     post: post,
+//   });
+// });
+
+app.put("/edit-post/:id", upload.single("image"), async (req, resp) => {
+  let updateData = {
+    title: req.body.title,
+    content: req.body.content,
+    author: req.body.author,
+    status: req.body.status,
+  };
+  if (req.file) {
+    updateData.image = req.file.filename;
+  }
+  const post = await Post.findByIdAndUpdate(
+    req.params.id,
+    updateData,
+    { new: true }
+  );
   if (!post) {
     return resp.status(404).send({ message: "Post not found" });
   }
   resp.send({
     message: "Post updated successfully",
-    post: post,
+    post,
   });
 });
 
@@ -121,16 +184,16 @@ app.delete("/:id", async (req, resp) => {
 // -----------------------------------------------------------------------------------------------
 
 // Get user drafts
-app.get("/drafts/:author", async (req, resp) => {
-  const drafts = await Post.find({
-    author: req.params.author,
-    status: "draft",
-  });
-  resp.send({
-    message: "Drafts found",
-    drafts: drafts,
-  });
-});
+// app.get("/drafts/:author", async (req, resp) => {
+//   const drafts = await Post.find({
+//     author: req.params.author,
+//     status: "draft",
+//   });
+//   resp.send({
+//     message: "Drafts found",
+//     drafts: drafts,
+//   });
+// });
 
 // -----------------------------------------------------------------------------------------------
 

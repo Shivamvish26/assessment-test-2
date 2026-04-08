@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import moment from "moment";
 
 export default function CreatePostPage() {
   const datapost = [
@@ -41,6 +42,25 @@ export default function CreatePostPage() {
     },
   ];
 
+  const [postData, setPostData] = useState([]);
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await fetch(
+          `http://localhost:5000/my-posts/${user.name}`,
+        );
+        const data = await result.json();
+        setPostData(data.posts);
+        console.log(data);
+      } catch (error) {
+        console.log("Error while fetching the data", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <>
       <div className="py-5">
@@ -65,14 +85,14 @@ export default function CreatePostPage() {
                 </tr>
               </thead>
               <tbody>
-                {datapost.map((post) => {
+                {postData.map((post) => {
                   return (
-                    <tr>
-                      <td>{post.id}</td>
+                    <tr key={post._id}>
+                      <td>{post._id}</td>
                       <td>{post.title}</td>
                       <td>{post.content}</td>
                       <td>{post.author}</td>
-                      <td>{post.timestamp}</td>
+                      <td>{moment(post.updatedAt).format("DD MMM YYYY")}</td>
                       <td>{post.status}</td>
                       <td className="d-flex">
                         <Link

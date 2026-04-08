@@ -43,7 +43,7 @@ export default function NavbarHeader() {
               <>
                 <div className="d-flex align-items-center">
                   <li className="nav-item">
-                    <Link className="nav-link text-white" to="/profile">
+                    <Link className="nav-link text-white" to="#">
                       {user.name}
                     </Link>
                   </li>
