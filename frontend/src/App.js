@@ -7,6 +7,8 @@ import RegisterPage from "./Pages/RegisterPage";
 import CreatePostPage from "./Pages/CreatePostPage";
 import SinglePostPage from "./Pages/SinglePostPage";
 import PrivateRoute from "./Components/ProtectedRoute";
+import AddNewPost from "./Pages/AddNewPost";
+import EditPost from "./Pages/EditPost";
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
           <Route path="/create" element={<CreatePostPage />} />
         </Route>
         <Route path="/post/:id" element={<SinglePostPage />} />
+        <Route path="/edit-post/:id" element={<EditPost />} />
+        <Route path="/add-post" element={<AddNewPost />} />
       </Routes>
     </>
   );
