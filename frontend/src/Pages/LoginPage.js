@@ -34,7 +34,7 @@ export default function LoginPage() {
     });
     let data = await result.json();
     console.log(data);
-    alert(data.message);
+    console.log(data.message);
     setEmail("");
     setPassword("");
     if (data.user) {

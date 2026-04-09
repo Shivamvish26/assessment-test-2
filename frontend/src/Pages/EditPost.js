@@ -29,7 +29,8 @@ export default function EditPost() {
       body: data,
     });
     let res = await result.json();
-    alert(res.message);
+    console.log(res)
+    console.log("Post Updated",res.message);
     navigate("/create");
   };
 
@@ -45,6 +46,7 @@ export default function EditPost() {
         setStatus(data.post.status);
         // image bhi set hoga
         setOldImage(data.post.image);
+        console.log("data fetched",data)
       } catch (error) {
         console.log("Error fetching post", error);
       }
