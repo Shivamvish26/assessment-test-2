@@ -47,11 +47,11 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await fetch(
-          `http://localhost:5000/get-post`,
-        );
+        const result = await fetch(`http://localhost:5000/get-post`);
         const data = await result.json();
-        setPostData(data.posts);
+        setTimeout(() => {
+          setPostData(data.posts);
+        }, 2000);
         console.log(data);
       } catch (error) {
         console.log("Error while fetching the data", error);
@@ -66,61 +66,63 @@ export default function HomePage() {
         <div className="container">
           <div className="d-flex align-items-center justify-content-between">
             <h1>Blogs</h1>
-
           </div>
           <div>
-           <div className="container mt-4">
-  <div className="row">
-    {postData.map((post) => (
-      <div className="col-md-4 mb-4" key={post._id}>
-        
-        <Link
-          to={`/post/${post._id}`}
-          className="text-decoration-none text-dark"
-        >
-          <div className="card h-100 shadow-sm">
+            <div className="container mt-4">
+              <div className="row">
+                {postData.length > 0 ? (
+                  postData.map((post) => (
+                    <div className="col-md-4 mb-4" key={post._id}>
+                      <Link
+                        to={`/post/${post._id}`}
+                        className="text-decoration-none text-dark"
+                      >
+                        <div className="card h-100 shadow-sm">
+                          <img
+                            src={`http://localhost:5000/upload/${post.image}`}
+                            className="card-img-top"
+                            alt="post"
+                            style={{ height: "200px", objectFit: "cover" }}
+                          />
 
-            <img
-              src={`http://localhost:5000/upload/${post.image}`}
-              className="card-img-top"
-              alt="post"
-              style={{ height: "200px", objectFit: "cover" }}
-            />
+                          <div className="card-body">
+                            <h5 className="card-title">{post.title}</h5>
 
-            <div className="card-body">
-              <h5 className="card-title">{post.title}</h5>
+                            <p className="card-text">
+                              {post.content
+                                .replace(/<[^>]+>/g, "")
+                                .slice(0, 80)}
+                              ...
+                            </p>
+                          </div>
 
-              <p className="card-text">
-                {post.content.replace(/<[^>]+>/g, "").slice(0, 80)}...
-              </p>
+                          <div className="card-footer bg-white border-0">
+                            <small className="text-muted d-block">
+                              By {post.author}
+                            </small>
+                            <small className="text-muted">
+                              {moment(post.updatedAt).format("DD MMM YYYY")}
+                            </small>
+
+                            <span
+                              className={`badge ms-2 ${
+                                post.status === "published"
+                                  ? "bg-success"
+                                  : "bg-warning text-dark"
+                              }`}
+                            >
+                              {post.status}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  ))
+                ) : (
+                  <h5>Loading Posts...</h5>
+                )}
+              </div>
             </div>
-
-            <div className="card-footer bg-white border-0">
-              <small className="text-muted d-block">
-                By {post.author}
-              </small>
-              <small className="text-muted">
-                {moment(post.updatedAt).format("DD MMM YYYY")}
-              </small>
-
-              <span
-                className={`badge ms-2 ${
-                  post.status === "published"
-                    ? "bg-success"
-                    : "bg-warning text-dark"
-                }`}
-              >
-                {post.status}
-              </span>
-            </div>
-
-          </div>
-        </Link>
-
-      </div>
-    ))}
-  </div>
-</div>
           </div>
         </div>
       </div>

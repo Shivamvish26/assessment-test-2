@@ -35,7 +35,7 @@ export default function RegisterPage() {
     });
     let data = await result.json();
     console.log(data);
-    alert(data.message);
+    console.log(data.message);
     setName("");
     setEmail("");
     setPassword("");

@@ -9,11 +9,8 @@ export default function AddNewPost() {
   const [image, setImage] = useState(null);
   const [author, setAuthor] = useState(user?.name || "");
   const [status, setStatus] = useState("draft");
-  
 
   const navigate = useNavigate();
-
-
 
   const handleSavePost = async (e) => {
     e.preventDefault();
@@ -32,10 +29,10 @@ export default function AddNewPost() {
         body: data,
       });
       let res = await result.json();
-      console.log(res)
+      console.log(res);
       console.log(res.message);
       setTitle("");
-      setContent("");   
+      setContent("");
       setAuthor("");
       setStatus("draft");
       setImage(null);

@@ -5,7 +5,7 @@ const Post = require("./model/Post");
 const Like = require("./model/Likes");
 const Comment = require("./model/Comment");
 const cors = require("cors");
-const multer = require("multer")
+const multer = require("multer");
 
 // db connection
 require("./db/config");
@@ -20,8 +20,8 @@ app.use("/upload", express.static("upload"));
 
 // folder create karna
 const upload = multer({
-  dest:"upload/"
-})
+  dest: "upload/",
+});
 
 //Cehcking route
 // app.post("/sample",(req,resp)=>{
@@ -80,11 +80,9 @@ app.post("/create", upload.single("image"), async (req, resp) => {
     content: req.body.content,
     author: req.body.author,
     status: req.body.status,
-  image: req.file ? req.file.filename : ""
+    image: req.file ? req.file.filename : "",
   });
-
   const result = await post.save();
-
   resp.send({
     message: "Post Created Successfully",
     post: result,
@@ -109,7 +107,6 @@ app.get("/my-posts/:author", async (req, resp) => {
   const posts = await Post.find({
     author: req.params.author,
   });
-
   resp.send({
     message: "All user posts",
     posts: posts,
@@ -153,11 +150,9 @@ app.put("/edit-post/:id", upload.single("image"), async (req, resp) => {
   if (req.file) {
     updateData.image = req.file.filename;
   }
-  const post = await Post.findByIdAndUpdate(
-    req.params.id,
-    updateData,
-    { new: true }
-  );
+  const post = await Post.findByIdAndUpdate(req.params.id, updateData, {
+    new: true,
+  });
   if (!post) {
     return resp.status(404).send({ message: "Post not found" });
   }
@@ -172,11 +167,9 @@ app.put("/edit-post/:id", upload.single("image"), async (req, resp) => {
 // Delete post api
 app.delete("/:id", async (req, resp) => {
   const post = await Post.findByIdAndDelete(req.params.id);
-
   if (!post) {
     return resp.status(404).send({ message: "Post not found" });
   }
-
   resp.send({
     message: "Post deleted successfully",
   });
@@ -201,14 +194,14 @@ app.delete("/:id", async (req, resp) => {
 app.post("/api/like/:postId", async (req, resp) => {
   const { user } = req.body;
   const { postId } = req.params;
-  const existing = await Like.findOne({ user, post: postId });
+  const existing = await Like.findOne({ user, postId });
   if (existing) {
     await Like.deleteOne({ _id: existing._id });
     return resp.send({
       message: "Post unliked successfully",
     });
   } else {
-    await Like.create({ user, post: postId });
+    await Like.create({ user, postId });
     return resp.send({
       message: "Post liked successfully",
     });
@@ -221,7 +214,7 @@ app.post("/api/like/:postId", async (req, resp) => {
 app.get("/api/count/:postId", async (req, resp) => {
   console.log("Post ID:", req.params.postId);
   const count = await Like.countDocuments({
-    post: req.params.postId,
+    postId: req.params.postId,
   });
   console.log("Count:", count);
   resp.send({
@@ -255,7 +248,7 @@ app.post("/api/comment/:postId", async (req, resp) => {
 
 // get all comments for a post api
 
-app.get("/api/comment/:postId", async (req, resp) => {
+app.get("/api/get-comment/:postId", async (req, resp) => {
   const comments = await Comment.find({
     post: req.params.postId,
   });
@@ -268,6 +261,22 @@ app.get("/api/comment/:postId", async (req, resp) => {
 // -----------------------------------------------------------------------------------------------
 
 // search api and pagination api
+
+app.get("/search/:key", async (req, resp) => {
+  const key = req.params.key;
+  let result = await Post.find({
+    // status:"published", => ye sirf published data show karaga
+    $or: [
+      { title: { $regex: key, $options: "i" } },
+      { content: { $regex: key, $options: "i" } },
+      { author: { $regex: key, $options: "i" } },
+    ],
+  });
+  resp.send({
+    message: "Search results",
+    posts: result,
+  });
+});
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");

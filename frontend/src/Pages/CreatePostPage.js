@@ -53,6 +53,7 @@ export default function CreatePostPage() {
         method: "DELETE",
       });
       let res = await result.json();
+      console.log("data deleted", res);
       alert(res.message);
       setPostData(postData.filter((post) => post._id !== id));
     } catch (error) {
@@ -60,19 +61,29 @@ export default function CreatePostPage() {
     }
   };
 
+  const searchHandleproduct = async (e) => {
+    let key = e.target.value;
+    if (key) {
+      let result = await fetch(`http://localhost:5000/search/${key}`);
+      let data = await result.json();
+      console.log(data);
+      setPostData(data.posts);
+    } else {
+      fetchData();
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      const result = await fetch(`http://localhost:5000/my-posts/${user.name}`);
+      const data = await result.json();
+      setPostData(data.posts);
+    } catch (error) {
+      console.log("Error while fetching the data", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await fetch(
-          `http://localhost:5000/my-posts/${user.name}`,
-        );
-        const data = await result.json();
-        setPostData(data.posts);
-        console.log(data);
-      } catch (error) {
-        console.log("Error while fetching the data", error);
-      }
-    };
     fetchData();
   }, []);
 
@@ -85,6 +96,14 @@ export default function CreatePostPage() {
             <Link to="/add-post" className="btn btn-primary">
               Create New Post
             </Link>
+          </div>
+          <div className="text-center">
+            <input
+              className="form-control w-50"
+              onChange={searchHandleproduct}
+              type="text"
+              placeholder="Search Product"
+            />
           </div>
           <div>
             <table className="table table-bordered mt-4">
