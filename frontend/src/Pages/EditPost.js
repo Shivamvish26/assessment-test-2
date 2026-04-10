@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Editor } from "react-simple-wysiwyg";
 
 export default function EditPost() {
+  let token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user"));
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -14,6 +15,7 @@ export default function EditPost() {
 
   const navigate = useNavigate();
 
+  // post ko update karna kai liye
   const handleUpdate = async (e) => {
     e.preventDefault();
     const data = new FormData();
@@ -27,17 +29,25 @@ export default function EditPost() {
     let result = await fetch(`http://localhost:5000/edit-post/${id}`, {
       method: "PUT",
       body: data,
+      headers: {
+        authorization: `bearer ${token}`,
+      },
     });
     let res = await result.json();
-    console.log(res)
-    console.log("Post Updated",res.message);
+    console.log(res);
+    console.log("Post Updated", res.message);
     navigate("/create");
   };
 
+  // data ko fetch karna kai liye
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        let res = await fetch(`http://localhost:5000/${id}`);
+        let res = await fetch(`http://localhost:5000/${id}`, {
+          headers: {
+            authorization: `bearer ${token}`,
+          },
+        });
         let data = await res.json();
         //yaha data set hoga
         setTitle(data.post.title);
@@ -46,7 +56,7 @@ export default function EditPost() {
         setStatus(data.post.status);
         // image bhi set hoga
         setOldImage(data.post.image);
-        console.log("data fetched",data)
+        console.log("data fetched", data);
       } catch (error) {
         console.log("Error fetching post", error);
       }
@@ -95,10 +105,20 @@ export default function EditPost() {
                     type="file"
                     className="form-control"
                     placeholder="Upload an image"
-                    required
                     onChange={(e) => setImage(e.target.files[0])}
                   />
                 </div>
+                {oldImage && (
+                  <div className="mt-3 mb-3">
+                    <p className="small">Current Image:</p>
+                    <img
+                      src={`http://localhost:5000/upload/${oldImage}`}
+                      alt="old"
+                      width="150"
+                      className="shadow-sm"
+                    />
+                  </div>
+                )}
               </div>
               <div className="mb-3">
                 <label htmlFor="name" className="form-label">
