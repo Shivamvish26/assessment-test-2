@@ -15,8 +15,8 @@ function App() {
     <>
       <NavbarHeader />
       <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/home" element={<Homepage />} />
+        <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route element={<PrivateRoute />}>
           <Route path="/create" element={<CreatePostPage />} />
