@@ -46,7 +46,7 @@ app.post("/register", async (req, resp) => {
   Jwt.sign(
     { userId: result._id, email: result.email },
     JwtKey,
-    { expiresIn: "3h" },
+    { expiresIn: "7d" },
     (err, token) => {
       if (err) {
         return resp.send({
@@ -78,7 +78,7 @@ app.post("/login", async (req, resp) => {
       Jwt.sign(
         { userId: user._id, email: user.email },
         JwtKey,
-        { expiresIn: "3h" },
+        { expiresIn: "7d" },
         (err, token) => {
           if (err) {
             return resp.send({
