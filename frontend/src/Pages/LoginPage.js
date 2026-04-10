@@ -41,7 +41,7 @@ export default function LoginPage() {
     if (data.user) {
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("token", data.auth);
-      navigate("/home");
+      navigate("/");
     }
     setEmail("");
     setPassword("");

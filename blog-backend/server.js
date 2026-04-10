@@ -130,7 +130,7 @@ app.post("/create", upload.single("image"),VerifyToken, async (req, resp) => {
 // ----------------------------------------------------------------------------------------------
 
 // get all post api (home page api sirf published data)
-app.get("/get-post", VerifyToken, async (req, resp) => {
+app.get("/get-post", async (req, resp) => {
   const posts = await Post.find({ status: "published" });
   resp.send({
     message: "All Published Posts",
