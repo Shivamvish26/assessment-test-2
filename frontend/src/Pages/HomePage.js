@@ -43,15 +43,12 @@ export default function HomePage() {
   ];
 
   const [postData, setPostData] = useState([]);
-    let token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await fetch(`http://localhost:5000/get-post`,{
-          headers: {
-            authorization:`bearer ${token}`,
-          },
+        const result = await fetch(`http://localhost:5000/get-post`, {
+       
         });
         const data = await result.json();
         setTimeout(() => {

@@ -46,7 +46,7 @@ app.post("/register", async (req, resp) => {
   Jwt.sign(
     { userId: result._id, email: result.email },
     JwtKey,
-    { expiresIn: "3h" },
+    { expiresIn: "7d" },
     (err, token) => {
       if (err) {
         return resp.send({
@@ -78,7 +78,7 @@ app.post("/login", async (req, resp) => {
       Jwt.sign(
         { userId: user._id, email: user.email },
         JwtKey,
-        { expiresIn: "3h" },
+        { expiresIn: "7d" },
         (err, token) => {
           if (err) {
             return resp.send({
@@ -130,7 +130,7 @@ app.post("/create", upload.single("image"),VerifyToken, async (req, resp) => {
 // ----------------------------------------------------------------------------------------------
 
 // get all post api (home page api sirf published data)
-app.get("/get-post", VerifyToken, async (req, resp) => {
+app.get("/get-post", async (req, resp) => {
   const posts = await Post.find({ status: "published" });
   resp.send({
     message: "All Published Posts",
