@@ -44,13 +44,18 @@ export default function CreatePostPage() {
 
   const [postData, setPostData] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
+  let token = localStorage.getItem("token");
 
+  // post ko delete kiye hai
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Are you sure?");
     if (!confirmDelete) return;
     try {
       let result = await fetch(`http://localhost:5000/${id}`, {
         method: "DELETE",
+        headers: {
+          authorization: `bearer ${token}`,
+        },
       });
       let res = await result.json();
       console.log("data deleted", res);
@@ -61,10 +66,15 @@ export default function CreatePostPage() {
     }
   };
 
+  // search ko handle kiye hai
   const searchHandleproduct = async (e) => {
     let key = e.target.value;
     if (key) {
-      let result = await fetch(`http://localhost:5000/search/${key}`);
+      let result = await fetch(`http://localhost:5000/search/${key}`, {
+        headers: {
+          authorization: `bearer ${token}`,
+        },
+      });
       let data = await result.json();
       console.log(data);
       setPostData(data.posts);
@@ -73,9 +83,17 @@ export default function CreatePostPage() {
     }
   };
 
+  // post ko fetch kiye hai
   const fetchData = async () => {
     try {
-      const result = await fetch(`http://localhost:5000/my-posts/${user.name}`);
+      const result = await fetch(
+        `http://localhost:5000/my-posts/${user.name}`,
+        {
+          headers: {
+            authorization: `bearer ${token}`,
+          },
+        },
+      );
       const data = await result.json();
       setPostData(data.posts);
     } catch (error) {

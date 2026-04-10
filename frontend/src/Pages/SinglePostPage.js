@@ -10,6 +10,7 @@ export default function SinglePostPage() {
   const [likeCount, setLikeCount] = useState(0);
   const [liked, setLiked] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
+  let token = localStorage.getItem("token");
 
   //   comment post ka integration
   const handlesubmitcomment = async (e) => {
@@ -20,6 +21,7 @@ export default function SinglePostPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          authorization: `bearer ${token}`,
         },
         body: JSON.stringify({
           user: userData.name,
@@ -42,6 +44,7 @@ export default function SinglePostPage() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        authorization: `bearer ${token}`,
       },
       body: JSON.stringify({
         user: userData.name,
@@ -62,7 +65,11 @@ export default function SinglePostPage() {
   //   fetch comment ki api
   useEffect(() => {
     const fetchcomment = async () => {
-      let result = await fetch(`http://localhost:5000/api/get-comment/${id}`);
+      let result = await fetch(`http://localhost:5000/api/get-comment/${id}`, {
+        headers: {
+          authorization: `bearer ${token}`,
+        },
+      });
       const data = await result.json();
       console.log("fetching the comment for the post", data);
       SetDisplayComment(data.comments);
@@ -74,7 +81,11 @@ export default function SinglePostPage() {
   useEffect(() => {
     const fetchpost = async () => {
       try {
-        let result = await fetch(`http://localhost:5000/${id}`);
+        let result = await fetch(`http://localhost:5000/${id}`, {
+          headers: {
+            authorization: `bearer ${token}`,
+          },
+        });
         const data = await result.json();
         console.log(data);
         setTimeout(() => {
@@ -91,7 +102,11 @@ export default function SinglePostPage() {
   //   like count ffetch
   useEffect(() => {
     const fetchLikes = async () => {
-      let res = await fetch(`http://localhost:5000/api/count/${id}`);
+      let res = await fetch(`http://localhost:5000/api/count/${id}`, {
+        headers: {
+          authorization: `bearer ${token}`,
+        },
+      });
       let data = await res.json();
       console.log("Total count", data.count);
       setLikeCount(data.count);

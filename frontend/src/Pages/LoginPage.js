@@ -34,13 +34,17 @@ export default function LoginPage() {
     });
     let data = await result.json();
     console.log(data);
-    console.log(data.message);
-    setEmail("");
-    setPassword("");
+    if (!result.ok) {
+      alert(data.message);
+      return;
+    }
     if (data.user) {
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.auth);
       navigate("/");
     }
+    setEmail("");
+    setPassword("");
   };
 
   return (

@@ -19,31 +19,36 @@ export default function RegisterPage() {
     setEmail(item);
   };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (emailError || !email) {
-      alert("Please fix all errors before submitting.");
-      setEmail("");
-      return;
-    }
-    let result = await fetch("http://localhost:5000/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email, password }),
-    });
-    let data = await result.json();
-    console.log(data);
-    console.log(data.message);
-    setName("");
+ const handleRegister = async (e) => {
+  e.preventDefault();
+  if (emailError || !email) {
+    alert("Please fix all errors before submitting.");
     setEmail("");
-    setPassword("");
-    if (data.user) {
-      localStorage.setItem("user", JSON.stringify(data.user));
-      navigate("/");
-    }
-  };
+    return;
+  }
+  let result = await fetch("http://localhost:5000/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name, email, password }),
+  });
+  let data = await result.json();
+  console.log(data);
+  if (!result.ok) {
+    alert(data.message);
+    return;
+  }
+  if (data.user) {
+    localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("token", data.auth);
+
+    navigate("/");
+  }
+  setName("");
+  setEmail("");
+  setPassword("");
+};
 
   return (
     <>

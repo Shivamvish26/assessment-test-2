@@ -9,6 +9,8 @@ export default function AddNewPost() {
   const [image, setImage] = useState(null);
   const [author, setAuthor] = useState(user?.name || "");
   const [status, setStatus] = useState("draft");
+  let token = localStorage.getItem("token");
+
 
   const navigate = useNavigate();
 
@@ -27,6 +29,9 @@ export default function AddNewPost() {
       let result = await fetch("http://localhost:5000/create", {
         method: "POST",
         body: data,
+        headers: {
+            authorization:`bearer ${token}`,
+          },
       });
       let res = await result.json();
       console.log(res);
