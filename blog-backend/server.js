@@ -1,27 +1,29 @@
-const express = require("express");
-const app = express();
-const User = require("./model/User");
+// ye server setup ka foundation hai jo nodejs mai use hota hai
+const express = require("express"); //express ek nodejs ka framework hai
+const app = express(); // app ek express ka instance hai jo api ko banae mai help karta hai, routing and all.     
+const User = require("./model/User"); // humne yaha hai schema ko import kiye hai model kai files mai sai.
 const Post = require("./model/Post");
 const Like = require("./model/Likes");
 const Comment = require("./model/Comment");
-const cors = require("cors");
-const multer = require("multer");
+const cors = require("cors"); // cors => cross origin resources sharing
+const multer = require("multer"); // ye file ya image uploaing kai liye use hota hai
 
 // JSON WebToken
 const Jwt = require("jsonwebtoken");
 // yaha pai hum key define karata hai wo secrate hota hai.
-const JwtKey = "blog-data";
+require("dotenv").config()
+const JwtKey = process.env.JWT_KEY;
 
 // db connection
-require("./db/config");
+require("./db/config"); //db connection file
 
 //middleware
-app.use(express.json());
+app.use(express.json()); //run during req and response lifecycle to process lifecycle.
 
 // Enable CORS for all routes
-app.use(cors());
+app.use(cors()); //backend and frontend mai help karta hai api ko
 
-app.use("/upload", express.static("upload"));
+app.use("/upload", express.static("upload")); //static folder ka use kar kai images save karne kai liye
 
 // folder create karna
 const upload = multer({
@@ -35,7 +37,7 @@ const upload = multer({
 
 // register api
 app.post("/register", async (req, resp) => {
-  let existingUser = await User.findOne({ email: req.body.email });
+  let existingUser = await User.findOne({ email: req.body.email }); //findone ek method hai jo mongodb ko retrive a single document from a database collection.
   if (existingUser) {
     return resp.send({ message: "Email already registered" });
   }
