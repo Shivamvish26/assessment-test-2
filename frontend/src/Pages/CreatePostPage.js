@@ -68,9 +68,9 @@ export default function CreatePostPage() {
 
   // search ko handle kiye hai
   const searchHandleproduct = async (e) => {
-    let key = e.target.value;
-    if (key) {
-      let result = await fetch(`http://localhost:5000/search/${key}`, {
+    let key = e.target.value; //jo user type karega wo key me store hoga
+    if (key) { //ya pe condition key ho raha hai
+      let result = await fetch(`http://localhost:5000/search/${key}`, { //har ek key pe search ki api call ho raha hai
         headers: {
           authorization: `bearer ${token}`,
         },
