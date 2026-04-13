@@ -9,7 +9,7 @@ export default function LoginPage() {
 
   const handleEmailChange = (e) => {
     let item = e.target.value;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //ye ek email ka pattern hai wo valid karta hai email ko jasi ki @ symbol and and .com check karta hai
     if (!emailRegex.test(item)) {
       setEmailError(true);
     } else {
@@ -19,7 +19,7 @@ export default function LoginPage() {
   };
 
   const handlelogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); //form reload ko prevent karta hai jab form submit hota hai
     if (emailError || !email) {
       alert("Please fix all errors before submitting.");
       setEmail("");

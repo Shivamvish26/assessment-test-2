@@ -11,7 +11,7 @@ import { BrowserRouter } from "react-router-dom";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <EditorProvider>
-    <BrowserRouter>
+    <BrowserRouter> {/* ye component hai jo react router ko enable karta hai app me */}
       <React.StrictMode>
         <App />
       </React.StrictMode>

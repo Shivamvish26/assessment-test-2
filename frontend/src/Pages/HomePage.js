@@ -72,6 +72,7 @@ export default function HomePage() {
           <div>
             <div className="container mt-4">
               <div className="row">
+                {/* we can aslo use in nested ternary operator */}
                 {postData.length > 0 ? (
                   postData.map((post) => (
                     <div className="col-md-4 mb-4" key={post._id}>
