@@ -1,6 +1,6 @@
 // ye server setup ka foundation hai jo nodejs mai use hota hai
 const express = require("express"); //express ek nodejs ka framework hai
-const app = express(); // app ek express ka instance hai jo api ko banae mai help karta hai, routing and all.     
+const app = express(); // app ek express ka instance hai jo api ko banae mai help karta hai, routing and all.
 const User = require("./model/User"); // humne yaha hai schema ko import kiye hai model kai files mai sai.
 const Post = require("./model/Post");
 const Like = require("./model/Likes");
@@ -11,7 +11,7 @@ const multer = require("multer"); // ye file ya image uploaing kai liye use hota
 // JSON WebToken
 const Jwt = require("jsonwebtoken");
 // yaha pai hum key define karata hai wo secrate hota hai.
-require("dotenv").config()
+require("dotenv").config();
 const JwtKey = process.env.JWT_KEY;
 
 // db connection
@@ -114,7 +114,7 @@ app.post("/login", async (req, resp) => {
 //   });
 // });
 
-app.post("/create", upload.single("image"),VerifyToken, async (req, resp) => {
+app.post("/create", upload.single("image"), VerifyToken, async (req, resp) => {
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
@@ -180,27 +180,32 @@ app.get("/:id", VerifyToken, async (req, resp) => {
 //   });
 // });
 
-app.put("/edit-post/:id", upload.single("image"), VerifyToken, async (req, resp) => {
-  let updateData = {
-    title: req.body.title,
-    content: req.body.content,
-    author: req.body.author,
-    status: req.body.status,
-  };
-  if (req.file) {
-    updateData.image = req.file.filename;
-  }
-  const post = await Post.findByIdAndUpdate(req.params.id, updateData, {
-    new: true,
-  });
-  if (!post) {
-    return resp.status(404).send({ message: "Post not found" });
-  }
-  resp.send({
-    message: "Post updated successfully",
-    post,
-  });
-});
+app.put(
+  "/edit-post/:id",
+  upload.single("image"),
+  VerifyToken,
+  async (req, resp) => {
+    let updateData = {
+      title: req.body.title,
+      content: req.body.content,
+      author: req.body.author,
+      status: req.body.status,
+    };
+    if (req.file) {
+      updateData.image = req.file.filename;
+    }
+    const post = await Post.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
+    if (!post) {
+      return resp.status(404).send({ message: "Post not found" });
+    }
+    resp.send({
+      message: "Post updated successfully",
+      post,
+    });
+  },
+);
 
 // -----------------------------------------------------------------------------------------------
 
@@ -318,10 +323,26 @@ app.get("/search/:key", VerifyToken, async (req, resp) => {
   });
 });
 
+// pagination api
+app.get("/posts", VerifyToken, async (req, resp) => {
+  const page = parseInt(req.query.page) || 1; //url sai value ko collect kar raha hai or agar value nahi hai to default 1 set kar dega
+  const limit = parseInt(req.query.limit) || 10; //limit 10 tak he hai => limit matlab ek page pai kitne post show hoga
+  const skip = (page - 1) * limit;
+  const posts = await Post.find().skip(skip).limit(limit);
+  const total = await Post.countDocuments();
+  resp.send({
+    message: "Posts with pagination",
+    posts: posts,
+    total: total,
+    page: page,
+    totalPages: Math.ceil(total / limit),
+  });
+});
+
 // ----------------------------------------------------------------------------------------------
 
 // VerifyToken
-
+//routeing level middleware
 function VerifyToken(req, resp, next) {
   let token = req.headers["authorization"];
   if (token) {

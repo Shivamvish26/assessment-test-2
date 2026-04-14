@@ -112,7 +112,7 @@ export default function SinglePostPage() {
       setLikeCount(data.count);
     };
     fetchLikes();
-  }, [id]);
+  }, [id]); 
 
   if (!post) {
     return <h3 className="text-center mt-5">Loading...</h3>;

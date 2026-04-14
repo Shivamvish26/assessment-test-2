@@ -18,12 +18,12 @@ export default function EditPost() {
   // post ko update karna kai liye
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const data = new FormData();
+    const data = new FormData(); //ye text aur file done send karta hai. Normal json me file send nahi karta hai, Isliye formdata use kiye hai
     data.append("title", title);
     data.append("content", content);
     data.append("author", author);
     data.append("status", status);
-    if (image) {
+    if (image) { //new image upload karna hai to old image delete karna hai, aur new image upload karna hai
       data.append("image", image);
     }
     let result = await fetch(`http://localhost:5000/edit-post/${id}`, {
